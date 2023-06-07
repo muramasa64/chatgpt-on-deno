@@ -258,7 +258,28 @@ export async function createOrUpdateAppMentionedTrigger(
   triggerToUpdate?: EventTrigger,
 ) {
   // deno-lint-ignore no-explicit-any
-  const channel_ids = channelIds as any;
+  let channel_ids = channelIds as any;
+
+  for (let i = 0; i < channel_ids.length; i++) {
+    const channel_id = channel_ids[i];
+    const channel_info = await client.conversations.info({
+      channel: `${channel_id}`,
+    });
+    if (channel_info.error) {
+      throw new Error(
+        `Failed to get channel info! (response: ${
+          JSON.stringify(channel_info)
+        })`,
+      );
+    }
+    const name = channel_info.channel?.name;
+    if (name && (name.indexOf("xs-") === 0 || name?.indexOf("xchat-") === 0)) {
+      throw new Error(`Failed to create trigger!`);
+    }
+  }
+  channel_ids = channel_ids.filter((v: string) => v !== null);
+
+  console.log(`channel_ids: ${channel_ids}, length: ${channel_ids.length}`);
 
   if (triggerToUpdate === undefined) {
     // Create a new trigger

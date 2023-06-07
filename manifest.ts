@@ -15,6 +15,7 @@ export default Manifest({
     "chat:write",
     "chat:write.public",
     "channels:join",
+    "channels:read",
     "channels:history",
     "triggers:read",
     "triggers:write",
